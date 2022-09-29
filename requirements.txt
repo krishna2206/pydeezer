@@ -1,10 +1,7 @@
 requests
+deezer-py>=1.3.7
 cryptography
 mutagen
-click
+rich
 pyinquirer
 colorama
-rich
-autopep8
-pylint
-deezer-py

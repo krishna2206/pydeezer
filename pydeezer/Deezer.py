@@ -1,19 +1,20 @@
-from functools import partial
 import hashlib
 from os import path
+from functools import partial
+from warnings import filterwarnings
 
 from deezer import Deezer as DeezerPy
-from deezer.gw import APIError as GWAPIError
+from deezer.gw import GWAPIError
 from deezer.api import APIError as APIError
 
 import requests
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import mutagen
 from mutagen import File
 from mutagen.id3 import ID3, APIC
 from mutagen.easyid3 import EasyID3
 from mutagen.mp3 import MP3
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 
 from .ProgressHandler import BaseProgressHandler, DefaultProgressHandler
@@ -25,6 +26,8 @@ from .exceptions import APIRequestError
 from .exceptions import DownloadLinkDecryptionError
 
 from . import util
+
+filterwarnings("ignore")
 
 
 class Deezer(DeezerPy):
@@ -282,7 +285,7 @@ class Deezer(DeezerPy):
                     return (url, key)
 
     def download_track(self, track, download_dir, quality=None, fallback=True, filename=None, renew=False,
-                       with_metadata=True, with_lyrics=True, tag_separator=", ", show_messages=True,
+                       with_metadata=True, with_lyrics=True, tag_separator=", ", show_messages=True, with_progress=True,
                        progress_handler: BaseProgressHandler = None, **kwargs):
         """Downloads the given track
 
@@ -342,11 +345,12 @@ class Deezer(DeezerPy):
 
         data_iter = res.iter_content(chunk_size)
 
-        if not progress_handler:
-            progress_handler = DefaultProgressHandler()
+        if with_progress:
+            if not progress_handler:
+                progress_handler = DefaultProgressHandler()
 
-        progress_handler.initialize(data_iter, title, quality_key, total_filesize,
-                                    chunk_size, track_id=track["id"])
+            progress_handler.initialize(data_iter, title, quality_key, total_filesize,
+                                        chunk_size, track_id=track["id"])
 
         with open(download_path, "wb") as f:
             f.seek(0)
@@ -358,8 +362,9 @@ class Deezer(DeezerPy):
                     f.write(chunk)
                 elif len(chunk) < chunk_size:
                     f.write(chunk)
-                    progress_handler.update(
-                        track_id=track["id"], current_chunk_size=current_chunk_size)
+                    if with_progress:
+                        progress_handler.update(
+                            track_id=track["id"], current_chunk_size=current_chunk_size)
                     break
                 else:
                     cipher = Cipher(algorithms.Blowfish(blowfish_key),
@@ -376,8 +381,9 @@ class Deezer(DeezerPy):
 
                 i += 1
 
-                progress_handler.update(
-                    track_id=track["id"], current_chunk_size=current_chunk_size)
+                if with_progress:
+                    progress_handler.update(
+                        track_id=track["id"], current_chunk_size=current_chunk_size)
 
         if with_metadata:
             if ext.lower() == ".flac":
@@ -392,8 +398,9 @@ class Deezer(DeezerPy):
         if show_messages:
             print("Track downloaded to:", download_path)
 
-        progress_handler.close(
-            track_id=track["id"], total_filesize=total_filesize)
+        if with_progress:
+            progress_handler.close(
+                track_id=track["id"], total_filesize=total_filesize)
 
     def get_tracks(self, track_ids):
         """Gets the list of the tracks that corresponds with the given {track_ids}

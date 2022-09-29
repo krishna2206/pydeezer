@@ -32,7 +32,7 @@ Commands:
   download  Download tracks
 ```
 
-#### Commands
+### Commands
 
 ```bash
 Usage: pydeezer download [OPTIONS]
@@ -60,7 +60,7 @@ Options:
 
 ## Usage as a package
 
-#### Logging In
+### Logging In
 
 ```python
 from pydeezer import Deezer
@@ -182,13 +182,6 @@ track["download"](download_dir, quality=track_formats.FLAC,
 #### Output
 
 ![progresshandlergif](https://media.giphy.com/media/xa8YtgCbBvK0jSfefa/giphy.gif)
-
-## TODO
-
-- [ ] More CLI features, save used Arls for convenience.
-- [x] Multithreaded downloader (1 song / 1 thread)
-- [ ] Binary file
-- [ ] GUI
 
 ## Disclaimer
 

@@ -19,7 +19,6 @@ setuptools.setup(
         "cryptography",
         "mutagen",
         "rich",
-        "click",
         "pyinquirer",
         "colorama"
     ],

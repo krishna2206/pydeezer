@@ -139,7 +139,7 @@ class Deezer(DeezerPy):
 
         title = track.get("title")
 
-        if "version" in track and track["version"] != "":
+        if "version" in track and track["version"] != "" and track["version"] is not None:
             title += " " + track["version"]
 
         def should_include_featuring():
@@ -182,8 +182,9 @@ class Deezer(DeezerPy):
             "_albumart": cover,
         }
 
-        if len(album_data["genres"]["data"]) > 0:
-            tags["genre"] = album_data["genres"]["data"][0]["name"]
+        if album_data["genres"]:
+            if len(album_data["genres"]["data"]) > 0:
+                tags["genre"] = album_data["genres"]["data"][0]["name"]
 
         _authors = list(filter(
             lambda contributor: contributor["role"] == "Author", track.get("contributors", [])))
@@ -228,7 +229,7 @@ class Deezer(DeezerPy):
             fallback = True
 
         try:
-            if not "md5_origin" in track:
+            if (not "md5_origin" in track) or (track["md5_origin"] is None):
                 raise DownloadLinkDecryptionError(
                     "MD5 is needed to decrypt the download link.")
 

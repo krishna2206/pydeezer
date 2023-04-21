@@ -205,3 +205,12 @@ def get_blowfish_key(track_id):
                            for i in range(16)]))
 
     return blowfish_key
+
+
+def set_cover_url(md5):
+    return {
+        "cover_small": "https://e-cdns-images.dzcdn.net/images/cover/" + md5 + "/56x56-000000-80-0-0.jpg",
+        "cover_medium": "https://e-cdns-images.dzcdn.net/images/cover/" + md5 + "/250x250-000000-80-0-0.jpg",
+        "cover_big": "https://e-cdns-images.dzcdn.net/images/cover/" + md5 + "/500x500-000000-80-0-0.jpg",
+        "cover_xl": "https://e-cdns-images.dzcdn.net/images/cover/" + md5 + "/1000x1000-000000-80-0-0.jpg",
+    }

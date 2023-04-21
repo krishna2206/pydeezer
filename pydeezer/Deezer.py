@@ -478,11 +478,17 @@ class Deezer(DeezerPy):
             partial(self.gw.get_album, album_id), partial(self.api.get_album, album_id), gw_priority=False)
 
         if m == "gw":
+            print("is gw")
             data = util.map_gw_album(data)
 
-        # TODO: maybe better logic?
-        data["cover_id"] = str(data["cover_small"]).split(
-            "cover/")[1].split("/")[0]
+        # ? Used by get_album_poster() method
+        data["cover_id"] = (
+            data["md5_image"] if data["md5_image"] is not None
+            else data["cover_small"].split("/")[5])
+
+        # ? Set cover url if not set
+        if None in (data["cover_small"], data["cover_medium"], data["cover_big"], data["cover_xl"]):
+            data.update(**util.set_cover_url(data["cover_id"]))
 
         return data, m
 
